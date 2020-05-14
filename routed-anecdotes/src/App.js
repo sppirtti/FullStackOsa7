@@ -1,12 +1,11 @@
 import React, { useState } from 'react'
 
-import ReactDOM from 'react-dom'
-
 import {
   BrowserRouter as Router,
   Switch,
   Route,
-  Link
+  Link,
+  useRouteMatch
 } from "react-router-dom"
 
 
@@ -27,10 +26,27 @@ const AnecdoteList = ({ anecdotes }) => (
   <div>
     <h2>Anecdotes</h2>
     <ul>
-      {anecdotes.map(anecdote => <li key={anecdote.id} >{anecdote.content}</li>)}
+      {anecdotes.map(anecdote =>
+        <li key={anecdote.id}>
+          <Link to={`/anecdotes/${anecdote.id}`}>{anecdote.content}
+          </Link></li>)}
+
     </ul>
   </div>
 )
+
+const Anecdote = ({ anecdote }) => {
+  return (
+    <div>
+      <h2>{anecdote.content}</h2>
+
+      <p>by <b>{anecdote.author}</b> has {anecdote.votes} likes</p>
+
+      <p>For more information see <a href={anecdote.info}>{anecdote.info} </a></p>
+
+    </div >
+  )
+}
 
 const About = () => (
   <div>
@@ -131,8 +147,15 @@ const App = () => {
 
     setAnecdotes(anecdotes.map(a => a.id === id ? voted : a))
   }
+  
+  const match = useRouteMatch('/anecdotes/:id')
+
+  const anecdoteId = match
+    ? anecdotes.find(anecdote => anecdote.id === match.params.id)
+    : null
+
   const padding = {
-    paddingRight: 15
+    paddingRight: 40
   }
 
 
@@ -155,6 +178,9 @@ const App = () => {
           <AnecdoteList anecdotes={anecdotes} />
         </Route>
       </Switch>
+      <Route path ="/anecdotes/:id">
+        <Anecdote anecdote={anecdoteId} />
+      </Route>
       <Footer />
     </div>
   )
